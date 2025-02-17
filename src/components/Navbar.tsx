@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Search, Bell, User } from "lucide-react";
+import logo from './assets/upskillnation-logo.svg';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +41,8 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-blue-600">UpskillNation</span>
+              {/* Replace the text with the logo image */}
+              <img src={logo} alt="UpskillNation Logo" className="h-10" />
             </Link>
             {/* Desktop Menu */}
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
