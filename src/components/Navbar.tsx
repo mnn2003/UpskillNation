@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Search, Bell, User } from "lucide-react";
-import logo from '../assets/upskillnation-logo.svg';
+import logo from '../assets/upskillnation-logo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
