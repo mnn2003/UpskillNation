@@ -12,7 +12,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-blue-600">Unstop Clone</span>
+              <span className="text-2xl font-bold text-blue-600">UpskillNation</span>
             </Link>
             {/* Desktop Menu */}
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
