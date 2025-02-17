@@ -5,10 +5,9 @@ import logo from './assets/upskillnation-logo.svg';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0); // Track last scroll position
-  const [isVisible, setIsVisible] = useState(true); // Toggle navbar visibility
+  const [lastScrollY, setLastScrollY] = useState(0); 
+  const [isVisible, setIsVisible] = useState(true); 
 
-  // Function to handle scroll events
   const handleScroll = () => {
     if (window.scrollY > lastScrollY) {
       // Scrolling down
@@ -17,14 +16,12 @@ const Navbar = () => {
       // Scrolling up
       setIsVisible(true);
     }
-    setLastScrollY(window.scrollY); // Update the last scroll position
+    setLastScrollY(window.scrollY); 
   };
 
   useEffect(() => {
-    // Add the scroll event listener
     window.addEventListener("scroll", handleScroll);
 
-    // Clean up the event listener when the component is unmounted
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -33,7 +30,7 @@ const Navbar = () => {
   return (
     <nav
       className={`bg-white shadow-sm transition-all duration-300 ${
-        isVisible ? "top-0" : "-top-16" // Slide in and out when scrolling
+        isVisible ? "top-0" : "-top-16" 
       } fixed w-full z-50`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,7 +38,6 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              {/* Replace the text with the logo image */}
               <img src={logo} alt="UpskillNation Logo" className="h-10" />
             </Link>
             {/* Desktop Menu */}
