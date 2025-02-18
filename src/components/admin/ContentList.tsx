@@ -46,74 +46,89 @@ const ContentList = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {content.map((item) => (
-            <tr key={`${item.type}-${item.id}`}>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {editingContent === item.id ? (
-                  <input
-                    type="text"
-                    value={editedContent.title ?? item.title}
-                    onChange={(e) => setEditedContent({ ...editedContent, title: e.target.value })}
-                    className="border rounded px-2 py-1 w-full"
-                  />
-                ) : (
-                  <span className="font-medium">{item.title}</span>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap capitalize">{item.type}</td>
-              <td className="px-6 py-4">
-                {editingContent === item.id ? (
-                  <textarea
-                    value={editedContent.description ?? item.description}
-                    onChange={(e) => setEditedContent({ ...editedContent, description: e.target.value })}
-                    className="border rounded px-2 py-1 w-full"
-                    rows={3}
-                  />
-                ) : (
-                  <div className="max-w-xs truncate" title={item.description}>{item.description}</div>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">{new Date(item.created_at).toLocaleDateString()}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex space-x-2">
-                  {editingContent === item.id ? (
-                    <>
-                      <button
-                        onClick={() => handleSaveContent(item.id, item.type)}
-                        className="text-green-600 hover:text-green-900"
-                      >
-                        <Save className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEditingContent(null);
-                          setEditedContent({});
-                        }}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </>
+          {content.map((item) => {
+            const isEditing = editingContent === item.id;
+            
+            return (
+              <tr key={item.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editedContent.title ?? item.title}
+                      onChange={(e) =>
+                        setEditedContent((prev) => ({ ...prev, title: e.target.value }))
+                      }
+                      className="border rounded px-2 py-1 w-full"
+                    />
                   ) : (
-                    <>
-                      <button
-                        onClick={() => handleEditContent(item.id, item)}
-                        className="text-primary-600 hover:text-primary-900"
-                      >
-                        <Edit className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteContent(item.id, item.type)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </>
+                    <span className="font-medium">{item.title}</span>
                   )}
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap capitalize">{item.type}</td>
+                <td className="px-6 py-4">
+                  {isEditing ? (
+                    <textarea
+                      value={editedContent.description ?? item.description}
+                      onChange={(e) =>
+                        setEditedContent((prev) => ({ ...prev, description: e.target.value }))
+                      }
+                      className="border rounded px-2 py-1 w-full"
+                      rows={3}
+                    />
+                  ) : (
+                    <div className="max-w-xs truncate" title={item.description}>
+                      {item.description}
+                    </div>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {new Date(item.created_at).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex space-x-2">
+                    {isEditing ? (
+                      <>
+                        <button
+                          onClick={() => handleSaveContent(item.id, item.type)}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          <Save className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingContent(null);
+                            setEditedContent({});
+                          }}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            setEditingContent(item.id);
+                            setEditedContent(item);
+                          }}
+                          className="text-primary-600 hover:text-primary-900"
+                        >
+                          <Edit className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteContent(item.id, item.type)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
