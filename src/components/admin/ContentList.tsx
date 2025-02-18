@@ -48,14 +48,15 @@ const ContentList = ({
         <tbody className="bg-white divide-y divide-gray-200">
           {content.map((item) => {
             const isEditing = editingContent === item.id;
-            
+            const currentItem = isEditing ? { ...item, ...editedContent } : item;
+
             return (
               <tr key={item.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {isEditing ? (
                     <input
                       type="text"
-                      value={editedContent.title ?? item.title}
+                      value={editedContent.title ?? currentItem.title}
                       onChange={(e) =>
                         setEditedContent((prev) => ({ ...prev, title: e.target.value }))
                       }
@@ -69,7 +70,7 @@ const ContentList = ({
                 <td className="px-6 py-4">
                   {isEditing ? (
                     <textarea
-                      value={editedContent.description ?? item.description}
+                      value={editedContent.description ?? currentItem.description}
                       onChange={(e) =>
                         setEditedContent((prev) => ({ ...prev, description: e.target.value }))
                       }
@@ -110,7 +111,7 @@ const ContentList = ({
                         <button
                           onClick={() => {
                             setEditingContent(item.id);
-                            setEditedContent(item);
+                            setEditedContent({});
                           }}
                           className="text-primary-600 hover:text-primary-900"
                         >
