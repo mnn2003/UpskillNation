@@ -48,6 +48,7 @@ const ContentList = ({
         <tbody className="bg-white divide-y divide-gray-200">
           {content.map((item) => {
             const isEditing = editingContent === item.id;
+            // Ensure `editedContent` only applies to the item being edited
             const currentItem = isEditing ? { ...item, ...editedContent } : item;
 
             return (
@@ -111,7 +112,7 @@ const ContentList = ({
                         <button
                           onClick={() => {
                             setEditingContent(item.id);
-                            setEditedContent({});
+                            setEditedContent({}); // Clear edited content when starting to edit
                           }}
                           className="text-primary-600 hover:text-primary-900"
                         >
