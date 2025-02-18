@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../lib/store';
-import { Trash2, Edit, Save, X, Plus, Calendar, Briefcase, GraduationCap, Users as UsersIcon } from 'lucide-react';
+import { Calendar, Briefcase, GraduationCap } from 'lucide-react';
+import EventForm from '../components/admin/EventForm';
+import JobForm from '../components/admin/JobForm';
+import LearnForm from '../components/admin/LearnForm';
+import ContentList from '../components/admin/ContentList';
 
 interface User {
   id: string;
@@ -76,6 +80,9 @@ const Admin = () => {
     end_date: '',
     location: '',
     category: '',
+    company: '',
+    type: '',
+    salary_range: '',
   });
   const [editingContent, setEditingContent] = useState<string | null>(null);
   const [editedContent, setEditedContent] = useState<Partial<ContentItem>>({});
@@ -194,7 +201,10 @@ const Admin = () => {
 
   const handleSaveContent = async (contentId: string, type: string) => {
     try {
-      const tableName = type === 'event' ? 'events' : type === 'job' ? 'jobs' : type === 'learn' ? 'learn' : 'posts';
+      const tableName = type === 'event' ? 'events' 
+                     : type === 'job' ? 'jobs' 
+                     : type === 'learn' ? 'learn' 
+                     : 'posts';
       
       // Remove the 'type' field from editedContent before updating
       const { type: _, ...updateData } = editedContent;
@@ -235,7 +245,6 @@ const Admin = () => {
       setContent(content.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error deleting content:', error);
-      // You might want to show an error message to the user here
     }
   };
 
@@ -244,7 +253,9 @@ const Admin = () => {
     if (!user) return;
 
     try {
-      const tableName = newContentType === 'event' ? 'events' : newContentType === 'job' ? 'jobs' : 'learn';
+      const tableName = newContentType === 'event' ? 'events' 
+                     : newContentType === 'job' ? 'jobs' 
+                     : 'learn';
       
       let contentData = {
         title: newContent.title,
@@ -259,6 +270,14 @@ const Admin = () => {
           end_date: newContent.end_date,
           location: newContent.location,
           category: newContent.category,
+        };
+      } else if (newContentType === 'job') {
+        contentData = {
+          ...contentData,
+          company: newContent.company,
+          location: newContent.location,
+          type: newContent.type,
+          salary_range: newContent.salary_range,
         };
       }
 
@@ -279,6 +298,9 @@ const Admin = () => {
         end_date: '',
         location: '',
         category: '',
+        company: '',
+        type: '',
+        salary_range: '',
       });
     } catch (error) {
       console.error('Error creating content:', error);
@@ -312,6 +334,40 @@ const Admin = () => {
   if (loading) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
   }
+
+  const renderContentForm = () => {
+    switch (newContentType) {
+      case 'event':
+        return (
+          <EventForm
+            newContent={newContent}
+            setNewContent={setNewContent}
+            handleCreateContent={handleCreateContent}
+            onCancel={() => setShowNewContentForm(false)}
+          />
+        );
+      case 'job':
+        return (
+          <JobForm
+            newContent={newContent}
+            setNewContent={setNewContent}
+            handleCreateContent={handleCreateContent}
+            onCancel={() => setShowNewContentForm(false)}
+          />
+        );
+      case 'learn':
+        return (
+          <LearnForm
+            newContent={newContent}
+            setNewContent={setNewContent}
+            handleCreateContent={handleCreateContent}
+            onCancel={() => setShowNewContentForm(false)}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -415,13 +471,13 @@ const Admin = () => {
                                 onClick={() => handleSaveUser(user.id)}
                                 className="text-green-600 hover:text-green-900"
                               >
-                                <Save className="h-5 w-5" />
+                                Save
                               </button>
                               <button
                                 onClick={() => setEditingUser(null)}
                                 className="text-red-600 hover:text-red-900"
                               >
-                                <X className="h-5 w-5" />
+                                Cancel
                               </button>
                             </div>
                           ) : (
@@ -429,7 +485,7 @@ const Admin = () => {
                               onClick={() => handleEditUser(user.id, user)}
                               className="text-primary-600 hover:text-primary-900"
                             >
-                              <Edit className="h-5 w-5" />
+                              Edit
                             </button>
                           )}
                         </td>
@@ -440,144 +496,8 @@ const Admin = () => {
               </div>
             ) : activeTab === 'content' ? (
               <div>
-                {/* New Content Form */}
                 {showNewContentForm ? (
-                  <div className="mb-8 bg-gray-50 p-6 rounded-lg">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-semibold">Create New Content</h3>
-                      <button
-                        onClick={() => setShowNewContentForm(false)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <form onSubmit={handleCreateContent} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Content Type
-                        </label>
-                        <select
-                          value={newContentType}
-                          onChange={(e) => setNewContentType(e.target.value as 'event' | 'job' | 'learn')}
-                          className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                        >
-                          <option value="event">Event</option>
-                          <option value="job">Job</option>
-                          <option value="learn">Learning Resource</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Title
-                        </label>
-                        <input
-                          type="text"
-                          value={newContent.title}
-                          onChange={(e) => setNewContent({ ...newContent, title: e.target.value })}
-                          className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Description
-                        </label>
-                        <textarea
-                          value={newContent.description}
-                          onChange={(e) => setNewContent({ ...newContent, description: e.target.value })}
-                          className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                          rows={3}
-                          required
-                        />
-                      </div>
-                      {(newContentType === 'event' || newContentType === 'learn') && (
-                        <>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Start Date
-                              </label>
-                              <input
-                                type="datetime-local"
-                                value={newContent.start_date}
-                                onChange={(e) => setNewContent({ ...newContent, start_date: e.target.value })}
-                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                required
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                End Date
-                              </label>
-                              <input
-                                type="datetime-local"
-                                value={newContent.end_date}
-                                onChange={(e) => setNewContent({ ...newContent, end_date: e.target.value })}
-                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                                required
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Location
-                            </label>
-                            <input
-                              type="text"
-                              value={newContent.location}
-                              onChange={(e) => setNewContent({ ...newContent, location: e.target.value })}
-                              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Category
-                            </label>
-                            <select
-                              value={newContent.category}
-                              onChange={(e) => setNewContent({ ...newContent, category: e.target.value })}
-                              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                              required
-                            >
-                              <option value="">Select a category</option>
-                              {newContentType === 'event' ? (
-                                <>
-                                  <option value="hackathon">Hackathon</option>
-                                  <option value="workshop">Workshop</option>
-                                  <option value="conference">Conference</option>
-                                  <option value="meetup">Meetup</option>
-                                </>
-                              ) : (
-                                <>
-                                  <option value="course">Course</option>
-                                  <option value="workshop">Workshop</option>
-                                  <option value="tutorial">Tutorial</option>
-                                  <option value="article">Article</option>
-                                </>
-                              )}
-                            </select>
-                          </div>
-                        </>
-                      )}
-                      <div className="flex justify-end space-x-3">
-                        <button
-                          type="button"
-                          onClick={() => setShowNewContentForm(false)}
-                          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                        >
-                          Create
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                  renderContentForm()
                 ) : (
                   <div className="mb-6 flex justify-end space-x-4">
                     <button
@@ -613,106 +533,16 @@ const Admin = () => {
                   </div>
                 )}
 
-                {/* Content List */}
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead>
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Title
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Description
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Created At
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {content.map((item) => (
-                        <tr key={`${item.type}-${item.id}`}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {editingContent === item.id ? (
-                              <input
-                                type="text"
-                                value={editedContent.title || item.title}
-                                onChange={(e) =>
-                                  setEditedContent({ ...editedContent, title: e.target.value })
-                                }
-                                className="border rounded px-2 py-1 w-full"
-                              />
-                            ) : (
-                              item.title
-                            )}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap capitalize">{item.type}</td>
-                          <td className="px-6 py-4">
-                            {editingContent === item.id ? (
-                              <textarea
-                                value={editedContent.description || item.description}
-                                onChange={(e) =>
-                                  setEditedContent({ ...editedContent, description: e.target.value })
-                                }
-                                className="border rounded px-2 py-1 w-full"
-                                rows={3}
-                              />
-                            ) : (
-                              <div className="max-w-xs truncate">{item.description}</div>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex space-x-2">
-                              {editingContent === item.id ? (
-                                <>
-                                  <button
-                                    onClick={() => handleSaveContent(item.id, item.type)}
-                                    className="text-green-600 hover:text-green-900"
-                                  >
-                                    <Save className="h-5 w-5" />
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setEditingContent(null);
-                                      setEditedContent({});
-                                    }}
-                                    className="text-red-600 hover:text-red-900"
-                                  >
-                                    <X className="h-5 w-5" />
-                                  </button>
-                                </>
-                              ) : (
-                                <>
-                                  <button
-                                    onClick={() => handleEditContent(item.id, item)}
-                                    className="text-primary-600 hover:text-primary-900"
-                                  >
-                                    <Edit className="h-5 w-5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteContent(item.id, item.type)}
-                                    className="text-red-600 hover:text-red-900"
-                                  >
-                                    <Trash2 className="h-5 w-5" />
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <ContentList
+                  content={content}
+                  editingContent={editingContent}
+                  editedContent={editedContent}
+                  setEditedContent={setEditedContent}
+                  handleEditContent={handleEditContent}
+                  handleSaveContent={handleSaveContent}
+                  handleDeleteContent={handleDeleteContent}
+                  setEditingContent={setEditingContent}
+                />
               </div>
             ) : (
               <div>
@@ -771,8 +601,6 @@ const Admin = () => {
                           </td>
                         </tr>
                       ))}
-                 Continuing directly from where we left off in the Admin.tsx file:
-
                     </tbody>
                   </table>
                 </div>
