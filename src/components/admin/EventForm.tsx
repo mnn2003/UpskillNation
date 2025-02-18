@@ -17,7 +17,7 @@ interface EventFormProps {
 
 const EventForm = ({ newContent, setNewContent, handleCreateContent, onCancel }: EventFormProps) => {
   return (
-    <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-200 max-w-lg mx-auto">
+    <div className="mb-8 bg-white p-6 rounded-xl shadow-md border border-gray-200">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-gray-800">Create New Event</h3>
         <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition">
