@@ -48,16 +48,13 @@ const ContentList = ({
         <tbody className="bg-white divide-y divide-gray-200">
           {content.map((item) => {
             const isEditing = editingContent === item.id;
-            // Ensure `editedContent` only applies to the item being edited
-            const currentItem = isEditing ? { ...item, ...editedContent } : item;
-
             return (
               <tr key={item.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {isEditing ? (
                     <input
                       type="text"
-                      value={editedContent.title ?? currentItem.title}
+                      value={editedContent.title ?? item.title}
                       onChange={(e) =>
                         setEditedContent((prev) => ({ ...prev, title: e.target.value }))
                       }
@@ -71,7 +68,7 @@ const ContentList = ({
                 <td className="px-6 py-4">
                   {isEditing ? (
                     <textarea
-                      value={editedContent.description ?? currentItem.description}
+                      value={editedContent.description ?? item.description}
                       onChange={(e) =>
                         setEditedContent((prev) => ({ ...prev, description: e.target.value }))
                       }
@@ -112,7 +109,10 @@ const ContentList = ({
                         <button
                           onClick={() => {
                             setEditingContent(item.id);
-                            setEditedContent({}); // Clear edited content when starting to edit
+                            setEditedContent({
+                              title: item.title, // Load the current item's data into editedContent
+                              description: item.description,
+                            });
                           }}
                           className="text-primary-600 hover:text-primary-900"
                         >
