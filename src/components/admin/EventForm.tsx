@@ -102,7 +102,7 @@ const EventForm = ({ newContent, setNewContent, handleCreateContent, onCancel }:
           </button>
           <button
             type="submit"
-            className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
           >
             Create Event
           </button>
