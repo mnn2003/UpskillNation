@@ -136,7 +136,7 @@ const Admin = () => {
           .select(`
             *,
             event:events(title),
-            profiles:profiles(full_name, email)
+            profiles(full_name, email)
           `)
           .order('created_at', { ascending: false }),
         supabase
@@ -144,13 +144,19 @@ const Admin = () => {
           .select(`
             *,
             job:jobs(title),
-            profiles:profiles(full_name, email)
+            profiles(full_name, email)
           `)
           .order('created_at', { ascending: false })
       ]);
 
-      if (registrationsData.error) throw registrationsData.error;
-      if (applicationsData.error) throw applicationsData.error;
+      if (registrationsData.error) {
+        console.error('Error fetching registrations:', registrationsData.error);
+        throw registrationsData.error;
+      }
+      if (applicationsData.error) {
+        console.error('Error fetching applications:', applicationsData.error);
+        throw applicationsData.error;
+      }
 
       setRegistrations(registrationsData.data || []);
       setApplications(applicationsData.data || []);
@@ -210,17 +216,26 @@ const Admin = () => {
 
   const handleDeleteContent = async (id: string, type: string) => {
     try {
-      const tableName = type === 'event' ? 'events' : type === 'job' ? 'jobs' : type === 'learn' ? 'learn' : 'posts';
+      const tableName = type === 'event' ? 'events' 
+                     : type === 'job' ? 'jobs' 
+                     : type === 'learn' ? 'learn' 
+                     : 'posts';
+      
       const { error } = await supabase
         .from(tableName)
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting content:', error);
+        throw error;
+      }
       
-      setContent(content.filter(c => c.id !== id));
+      // Update local state after successful deletion
+      setContent(content.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error deleting content:', error);
+      // You might want to show an error message to the user here
     }
   };
 
@@ -756,6 +771,8 @@ const Admin = () => {
                           </td>
                         </tr>
                       ))}
+                 Continuing directly from where we left off in the Admin.tsx file:
+
                     </tbody>
                   </table>
                 </div>
@@ -764,7 +781,7 @@ const Admin = () => {
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead>
-                 <tr>
+                      <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Job
                         </th>
