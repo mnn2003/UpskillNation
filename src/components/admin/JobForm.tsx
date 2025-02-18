@@ -17,7 +17,7 @@ interface JobFormProps {
 
 const JobForm = ({ newContent, setNewContent, handleCreateContent, onCancel }: JobFormProps) => {
   return (
-    <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-200 max-w-lg mx-auto">
+    <div className="mb-8 bg-white p-6 rounded-xl shadow-md border border-gray-200">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-gray-800">Create New Job</h3>
         <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition">
@@ -101,7 +101,7 @@ const JobForm = ({ newContent, setNewContent, handleCreateContent, onCancel }: J
           </button>
           <button
             type="submit"
-            className="px-4 py-2 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
           >
             Create Job
           </button>
