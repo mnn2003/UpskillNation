@@ -1,5 +1,6 @@
 import React from 'react';
-import { Edit, Trash2, Save, X } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
+import EditContentForm from './EditContentForm';
 
 interface ContentItem {
   id: string;
@@ -7,6 +8,12 @@ interface ContentItem {
   description: string;
   type: 'event' | 'job' | 'learn' | 'post';
   created_at: string;
+  start_date?: string;
+  end_date?: string;
+  location?: string;
+  category?: string;
+  company?: string;
+  salary_range?: string;
 }
 
 interface ContentListProps {
@@ -55,76 +62,47 @@ const ContentList = ({
         <tbody className="bg-white divide-y divide-gray-200">
           {content.map((item) => (
             <tr key={`${item.type}-${item.id}`}>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {editingContent === item.id ? (
-                  <input
-                    type="text"
-                    value={editedContent.title || item.title}
-                    onChange={(e) => setEditedContent({ ...editedContent, title: e.target.value })}
-                    className="border rounded px-2 py-1 w-full"
-                  />
-                ) : (
-                  item.title
-                )}
-              </td>
+              <td className="px-6 py-4 whitespace-nowrap">{item.title}</td>
               <td className="px-6 py-4 whitespace-nowrap capitalize">{item.type}</td>
               <td className="px-6 py-4">
-                {editingContent === item.id ? (
-                  <textarea
-                    value={editedContent.description || item.description}
-                    onChange={(e) => setEditedContent({ ...editedContent, description: e.target.value })}
-                    className="border rounded px-2 py-1 w-full"
-                    rows={3}
-                  />
-                ) : (
-                  <div className="max-w-xs truncate">{item.description}</div>
-                )}
+                <div className="max-w-xs truncate">{item.description}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {new Date(item.created_at).toLocaleDateString()}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex space-x-2">
-                  {editingContent === item.id ? (
-                    <>
-                      <button
-                        onClick={() => handleSaveContent(item.id, item.type)}
-                        className="text-green-600 hover:text-green-900"
-                      >
-                        <Save className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEditingContent(null);
-                          setEditedContent({});
-                        }}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleEditContent(item.id, item)}
-                        className="text-primary-600 hover:text-primary-900"
-                      >
-                        <Edit className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteContent(item.id, item.type)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </>
-                  )}
+                  <button
+                    onClick={() => handleEditContent(item.id, item)}
+                    className="text-primary-600 hover:text-primary-900"
+                  >
+                    <Edit className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteContent(item.id, item.type)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {editingContent && (
+        <EditContentForm
+          content={content.find(item => item.id === editingContent)!}
+          onSave={handleSaveContent}
+          onCancel={() => {
+            setEditingContent(null);
+            setEditedContent({});
+          }}
+          editedContent={editedContent}
+          setEditedContent={setEditedContent}
+        />
+      )}
     </div>
   );
 };
