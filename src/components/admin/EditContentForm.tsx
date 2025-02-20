@@ -12,6 +12,7 @@ interface EditContentFormProps {
     location?: string;
     category?: string;
     company?: string;
+    type_job?: string;
     salary_range?: string;
   };
   onSave: (contentId: string, type: string) => void;
@@ -56,6 +57,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
           onChange={(e) => setEditedContent({ ...editedContent, category: e.target.value })}
           className="w-full rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:ring-blue-500"
         >
+          <option value="">Select a category</option>
           <option value="hackathon">Hackathon</option>
           <option value="workshop">Workshop</option>
           <option value="conference">Conference</option>
@@ -79,10 +81,11 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Job Type</label>
         <select
-          value={editedContent.type || content.type}
-          onChange={(e) => setEditedContent({ ...editedContent, type: e.target.value })}
+          value={editedContent.type_job || content.type_job}
+          onChange={(e) => setEditedContent({ ...editedContent, type_job: e.target.value })}
           className="w-full rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:ring-blue-500"
         >
+          <option value="">Select job type</option>
           <option value="full-time">Full Time</option>
           <option value="part-time">Part Time</option>
           <option value="contract">Contract</option>
@@ -131,6 +134,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
           onChange={(e) => setEditedContent({ ...editedContent, category: e.target.value })}
           className="w-full rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:ring-blue-500"
         >
+          <option value="">Select a category</option>
           <option value="course">Course</option>
           <option value="workshop">Workshop</option>
           <option value="tutorial">Tutorial</option>
@@ -139,6 +143,19 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
       </div>
     </>
   );
+
+  const renderFields = () => {
+    switch (content.type) {
+      case 'event':
+        return renderEventFields();
+      case 'job':
+        return renderJobFields();
+      case 'learn':
+        return renderLearnFields();
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -183,9 +200,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
             />
           </div>
 
-          {content.type === 'event' && renderEventFields()}
-          {content.type === 'job' && renderJobFields()}
-          {content.type === 'learn' && renderLearnFields()}
+          {renderFields()}
 
           <div className="flex justify-end space-x-4 mt-6">
             <button
