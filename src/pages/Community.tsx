@@ -64,34 +64,33 @@ const Community = () => {
     }
   };
 
- const handleSubmitPost = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  
-  if (!user) {
-    alert('Please sign in to create a post.');
-    return;
-  }
+  const handleSubmitPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    
+    if (!user) {
+      setError('Please sign in to create a post');
+      return;
+    }
 
-  try {
-    const { error } = await supabase.from('posts').insert([
-      {
-        title: newPost.title,
-        content: newPost.content,
-        created_by: user.id,
-      },
-    ]);
+    try {
+      const { error } = await supabase.from('posts').insert([
+        {
+          title: newPost.title,
+          content: newPost.content,
+          created_by: user.id,
+        },
+      ]);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    setNewPost({ title: '', content: '' });
-    await fetchPosts();
-  } catch (error) {
-    console.error('Error creating post:', error);
-    setError('Failed to create post. Please try again.');
-  }
-};
-
+      setNewPost({ title: '', content: '' });
+      await fetchPosts();
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setError('Failed to create post. Please try again.');
+    }
+  };
 
   if (loading) {
     return (
