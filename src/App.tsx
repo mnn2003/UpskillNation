@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Auth from './pages/Auth';
 import News from './pages/News';
 import Admin from './pages/Admin';
+import ContentManagement from './pages/ContentManagement';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/news" element={<News />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/content-management" element={<ContentManagement />} />
           </Routes>
         </main>
         <Footer />
@@ -36,4 +38,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
