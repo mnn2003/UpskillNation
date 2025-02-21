@@ -13,6 +13,7 @@ interface ContentItem {
   location?: string;
   category?: string;
   company?: string;
+  type_job?: string;
   salary_range?: string;
 }
 
