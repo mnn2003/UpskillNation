@@ -29,40 +29,41 @@ const Community = () => {
   }, []);
 
   const fetchPosts = async () => {
-    try {
-      const { data: postsData, error: postsError } = await supabase
-        .from('posts')
-        .select(id, title, content, created_by, created_at, updated_at)
-        .order('created_at', { ascending: false });
+  try {
+    const { data: postsData, error: postsError } = await supabase
+      .from('posts')
+      .select('id, title, content, created_by, created_at, updated_at')
+      .order('created_at', { ascending: false });
 
-      if (postsError) throw postsError;
+    if (postsError) throw postsError;
 
-      if (postsData) {
-        const userIds = postsData.map(post => post.created_by);
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url')
-          .in('id', userIds);
+    if (postsData) {
+      const userIds = postsData.map(post => post.created_by);
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
 
-        if (profilesError) throw profilesError;
+      if (profilesError) throw profilesError;
 
-        const postsWithProfiles = postsData.map(post => ({
-          ...post,
-          profile: profilesData?.find(profile => profile.id === post.created_by) || {
-            full_name: 'Anonymous',
-            avatar_url: null
-          }
-        }));
+      const postsWithProfiles = postsData.map(post => ({
+        ...post,
+        profile: profilesData?.find(profile => profile.id === post.created_by) || {
+          full_name: 'Anonymous',
+          avatar_url: null
+        }
+      }));
 
-        setPosts(postsWithProfiles);
-      }
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      setError('Failed to load posts. Please try again later.');
-    } finally {
-      setLoading(false);
+      setPosts(postsWithProfiles);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    setError('Failed to load posts. Please try again later.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
