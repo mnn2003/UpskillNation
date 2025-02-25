@@ -10,10 +10,8 @@ const Navbar = () => {
 
   const handleScroll = () => {
     if (window.scrollY > lastScrollY) {
-      // Scrolling down
       setIsVisible(false);
     } else {
-      // Scrolling up
       setIsVisible(true);
     }
     setLastScrollY(window.scrollY); 
