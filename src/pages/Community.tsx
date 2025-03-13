@@ -140,7 +140,6 @@ const Community = () => {
         chatId = newChat.id;
       }
 
-      // Navigate to the chat page
       navigate('/chat');
     } catch (error) {
       console.error('Error starting chat:', error);
