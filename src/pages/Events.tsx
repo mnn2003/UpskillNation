@@ -13,6 +13,7 @@ interface Event {
   location: string;
   category: string;
   created_at: string;
+  image_url?: string;
 }
 
 interface Registration {
@@ -76,7 +77,6 @@ const Events = () => {
 
   const handleRegister = async (eventId: string) => {
     if (!user) {
-      // Redirect to auth page
       window.location.href = '/auth';
       return;
     }
@@ -93,7 +93,6 @@ const Events = () => {
 
       if (error) throw error;
 
-      // Update local state
       setRegistrations({
         ...registrations,
         [eventId]: { event_id: eventId, status: 'pending' }
@@ -217,10 +216,18 @@ const Events = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEvents.map((event) => (
               <div key={event.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="relative h-48 bg-primary-600">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Calendar className="w-16 h-16 text-white opacity-25" />
-                  </div>
+                <div className="relative h-48">
+                  {event.image_url ? (
+                    <img
+                      src={event.image_url}
+                      alt={event.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-primary-600 flex items-center justify-center">
+                      <Calendar className="w-16 h-16 text-white opacity-25" />
+                    </div>
+                  )}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
                     <h3 className="text-xl font-semibold text-white mb-2">{event.title}</h3>
                     <div className="flex items-center text-white/80">
