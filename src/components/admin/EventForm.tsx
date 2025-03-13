@@ -1,5 +1,6 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useRef } from 'react';
+import { X, Upload } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 interface EventFormProps {
   newContent: {
@@ -9,6 +10,7 @@ interface EventFormProps {
     end_date: string;
     location: string;
     category: string;
+    image_url?: string;
   };
   setNewContent: (content: any) => void;
   handleCreateContent: (e: React.FormEvent) => void;
@@ -16,6 +18,33 @@ interface EventFormProps {
 }
 
 const EventForm = ({ newContent, setNewContent, handleCreateContent, onCancel }: EventFormProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `event-images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      setNewContent({ ...newContent, image_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+
   return (
     <div className="mb-8 bg-white p-6 rounded-xl shadow-md border border-gray-200">
       <div className="flex justify-between items-center mb-6">
@@ -91,6 +120,42 @@ const EventForm = ({ newContent, setNewContent, handleCreateContent, onCancel }:
             <option value="conference">Conference</option>
             <option value="meetup">Meetup</option>
           </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-600 mb-1">Event Image</label>
+          <div className="mt-1 flex items-center">
+            {newContent.image_url ? (
+              <div className="relative">
+                <img
+                  src={newContent.image_url}
+                  alt="Event preview"
+                  className="h-32 w-32 object-cover rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => setNewContent({ ...newContent, image_url: '' })}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <Upload className="h-8 w-8 text-gray-400" />
+              </button>
+            )}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              className="hidden"
+            />
+          </div>
         </div>
         <div className="flex justify-end space-x-4">
           <button
