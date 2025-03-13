@@ -78,7 +78,6 @@ const Chat = () => {
       fetchMessages(currentChat);
       subscribeToMessages(currentChat);
       
-      // Set current participant
       const session = chatSessions.find(s => s.id === currentChat);
       if (session) {
         setCurrentParticipant({
