@@ -346,8 +346,6 @@ const Chat = () => {
     if (!user) return;
     
     try {
-      // For demo purposes, we'll create a chat with a sample user
-      // In a real app, you'd have a user selection UI
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id')
