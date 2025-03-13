@@ -1,5 +1,6 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 interface EditContentFormProps {
   content: {
@@ -14,6 +15,7 @@ interface EditContentFormProps {
     company?: string;
     type_job?: string;
     salary_range?: string;
+    image_url?: string;
   };
   onSave: (contentId: string, type: string) => void;
   onCancel: () => void;
@@ -28,6 +30,61 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
   editedContent,
   setEditedContent,
 }) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // First, delete the existing image if there is one
+      if (editedContent.image_url || content.image_url) {
+        const existingUrl = editedContent.image_url || content.image_url;
+        const pathMatch = existingUrl.match(/images\/(.*)/);
+        if (pathMatch) {
+          const existingPath = pathMatch[1];
+          await supabase.storage
+            .from('images')
+            .remove([existingPath]);
+        }
+      }
+
+      // Upload new image
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${content.type}-images/${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(fileName);
+
+      setEditedContent({ ...editedContent, image_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    try {
+      const imageUrl = editedContent.image_url || content.image_url;
+      if (imageUrl) {
+        const pathMatch = imageUrl.match(/images\/(.*)/);
+        if (pathMatch) {
+          const imagePath = pathMatch[1];
+          await supabase.storage
+            .from('images')
+            .remove([imagePath]);
+        }
+      }
+      setEditedContent({ ...editedContent, image_url: null });
+    } catch (error) {
+      console.error('Error removing image:', error);
+    }
+  };
+
   const renderEventFields = () => (
     <>
       <div className="grid grid-cols-2 gap-4">
@@ -63,6 +120,37 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
           <option value="conference">Conference</option>
           <option value="meetup">Meetup</option>
         </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Event Image</label>
+        <div className="mt-1 flex items-center">
+          {(editedContent.image_url || content.image_url) ? (
+            <div className="relative">
+              <img
+                src={editedContent.image_url || content.image_url}
+                alt="Event preview"
+                className="h-32 w-32 object-cover rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <label className="flex items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 cursor-pointer">
+              <input
+                type="file"
+                onChange={handleImageUpload}
+                accept="image/*"
+                className="hidden"
+              />
+              <Upload className="h-8 w-8 text-gray-400" />
+            </label>
+          )}
+        </div>
       </div>
     </>
   );
@@ -140,6 +228,37 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
           <option value="tutorial">Tutorial</option>
           <option value="article">Article</option>
         </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Resource Image</label>
+        <div className="mt-1 flex items-center">
+          {(editedContent.image_url || content.image_url) ? (
+            <div className="relative">
+              <img
+                src={editedContent.image_url || content.image_url}
+                alt="Resource preview"
+                className="h-32 w-32 object-cover rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <label className="flex items-center justify-center w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 cursor-pointer">
+              <input
+                type="file"
+                onChange={handleImageUpload}
+                accept="image/*"
+                className="hidden"
+              />
+              <Upload className="h-8 w-8 text-gray-400" />
+            </label>
+          )}
+        </div>
       </div>
     </>
   );
