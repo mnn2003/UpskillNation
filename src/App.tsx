@@ -1,18 +1,18 @@
-import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import Events from './pages/Events';
-import Jobs from './pages/Jobs';
-import Learn from './pages/Learn';
-import Community from './pages/Community';
-import Dashboard from './pages/Dashboard';
-import Auth from './pages/Auth';
-import News from './pages/News';
-import Admin from './pages/Admin';
-import ContentManagement from './pages/ContentManagement';
-import Chat from './pages/Chat';
+
+const Home = lazy(() => import('./pages/Home'));
+const Events = lazy(() => import('./pages/Events'));
+const Jobs = lazy(() => import('./pages/Jobs'));
+const Learn = lazy(() => import('./pages/Learn'));
+const Community = lazy(() => import('./pages/Community'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Auth = lazy(() => import('./pages/Auth'));
+const News = lazy(() => import('./pages/News'));
+const Admin = lazy(() => import('./pages/Admin'));
+const ContentManagement = lazy(() => import('./pages/ContentManagement'));
 
 function App() {
   return (
@@ -20,19 +20,20 @@ function App() {
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         <main className="flex-grow pt-16">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/content-management" element={<ContentManagement />} />
-            <Route path="/chat" element={<Chat />} />
-          </Routes>
+          <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/learn" element={<Learn />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/content-management" element={<ContentManagement />} />
+            </Routes>
+          </Suspense>
         </main>
         <Footer />
       </div>
