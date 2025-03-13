@@ -38,7 +38,7 @@ const ChatList: React.FC<ChatListProps> = ({
       <div className="overflow-y-auto flex-grow">
         {chatSessions.length === 0 ? (
           <div className="p-4 text-center text-gray-500">
-            No chats yet. Start a new conversation!
+            No chats yet. Start a new conversation
           </div>
         ) : (
           chatSessions.map((session) => (
