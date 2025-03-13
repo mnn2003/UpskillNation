@@ -12,7 +12,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Auth = lazy(() => import('./pages/Auth'));
 const News = lazy(() => import('./pages/News'));
 const Admin = lazy(() => import('./pages/Admin'));
-const Chat = lazy(() => import('./pages/chat'));
+const Chat = lazy(() => import('./pages/Chat'));
 const ContentManagement = lazy(() => import('./pages/ContentManagement'));
 
 function App() {
