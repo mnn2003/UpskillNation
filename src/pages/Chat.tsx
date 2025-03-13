@@ -143,7 +143,6 @@ const Chat = () => {
       // Fetch profiles for all participants
       const profileMap = await fetchProfiles(Array.from(participantIds));
 
-      // Enhance chat sessions with participant info
       const enhancedSessions = chats.map(chat => {
         // Find the other participant (assuming 1-on-1 chats)
         const otherParticipantId = chat.participant_ids.find(id => id !== user.id);
