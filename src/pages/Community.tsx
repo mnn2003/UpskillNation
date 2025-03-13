@@ -34,7 +34,7 @@ const Community = () => {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch posts
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
@@ -49,7 +49,7 @@ const Community = () => {
       }
 
       // Fetch profiles based on created_by user IDs
-      const userIds = postsData.map(post => post.created_by);
+      const userIds = postsData.map((post) => post.created_by);
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url')
@@ -58,13 +58,14 @@ const Community = () => {
       if (profilesError) throw profilesError;
 
       // Merge posts with profiles
-      const postsWithProfiles = postsData.map(post => ({
+      const postsWithProfiles = postsData.map((post) => ({
         ...post,
-        profile: profilesData?.find(profile => profile.id === post.created_by) || {
-          id: post.created_by,
-          full_name: 'Anonymous',
-          avatar_url: null
-        }
+        profile:
+          profilesData?.find((profile) => profile.id === post.created_by) || {
+            id: post.created_by,
+            full_name: 'Anonymous',
+            avatar_url: null,
+          },
       }));
 
       setPosts(postsWithProfiles);
@@ -79,25 +80,52 @@ const Community = () => {
   const handleSubmitPost = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
+
     if (!user) {
       setError('Please sign in to create a post');
       return;
     }
 
     try {
-      const { error } = await supabase.from('posts').insert([
-        {
-          title: newPost.title,
-          content: newPost.content,
-          created_by: user.id,
-        },
-      ]);
+      // Insert the new post and retrieve the created record
+      const { data, error } = await supabase
+        .from('posts')
+        .insert([
+          {
+            title: newPost.title,
+            content: newPost.content,
+            created_by: user.id,
+          },
+        ])
+        .select('*') // Select the newly created post
+        .single(); // Get a single record
 
       if (error) throw error;
 
+      // Fetch the profile of the user who created the post
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Create a new post object with the profile information
+      const newPostWithProfile = {
+        ...data,
+        profile: profileData || {
+          id: user.id,
+          full_name: 'Anonymous',
+          avatar_url: null,
+        },
+      };
+
+      // Update the posts state with the new post
+      setPosts((prevPosts) => [newPostWithProfile, ...prevPosts]);
+
+      // Clear the form
       setNewPost({ title: '', content: '' });
-      await fetchPosts();
     } catch (error) {
       console.error('Error creating post:', error);
       setError('Failed to create post. Please try again.');
@@ -163,7 +191,11 @@ const Community = () => {
 
         <div className="bg-white p-6 mb-8 rounded-lg shadow-md">
           <h2 className="text-2xl font-semibold mb-4">Create a Post</h2>
-          {error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">{error}</div>}
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmitPost} className="space-y-4">
             <input
               type="text"
@@ -180,9 +212,9 @@ const Community = () => {
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 h-32"
               required
             />
-            <button 
-              type="submit" 
-              className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition" 
+            <button
+              type="submit"
+              className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition"
               disabled={!user}
             >
               {user ? 'Post' : 'Sign in to Post'}
@@ -198,7 +230,11 @@ const Community = () => {
               <div key={post.id} className="bg-white p-6 mb-4 rounded-lg shadow-md">
                 <div className="flex items-center mb-4">
                   {post.profile.avatar_url ? (
-                    <img src={post.profile.avatar_url} alt={post.profile.full_name} className="w-10 h-10 rounded-full" />
+                    <img
+                      src={post.profile.avatar_url}
+                      alt={post.profile.full_name}
+                      className="w-10 h-10 rounded-full"
+                    />
                   ) : (
                     <User className="w-10 h-10 text-gray-500" />
                   )}
