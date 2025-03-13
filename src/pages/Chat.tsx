@@ -115,7 +115,6 @@ const Chat = () => {
     if (!user) return;
     
     try {
-      // First get the chats
       const { data: chats, error } = await supabase
         .from('chats')
         .select('id, participant_ids, last_message, last_message_at')
@@ -193,7 +192,6 @@ const Chat = () => {
 
       if (attachmentsError) throw attachmentsError;
 
-      // Group attachments by message_id
       const attachmentsByMessage = (attachmentsData || []).reduce((acc, attachment) => {
         if (!acc[attachment.message_id]) {
           acc[attachment.message_id] = [];
