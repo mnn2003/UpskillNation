@@ -12,7 +12,8 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Auth = lazy(() => import('./pages/Auth'));
 const News = lazy(() => import('./pages/News'));
 const Admin = lazy(() => import('./pages/Admin'));
-const ContentManagement = lazy(() => import('./pages/ContentManagement'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Chat = lazy(() => import('./pages/Chat'));
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               <Route path="/news" element={<News />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/content-management" element={<ContentManagement />} />
+              <Route path="/chat" element={<Chat />} />
             </Routes>
           </Suspense>
         </main>
